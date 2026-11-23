@@ -1,0 +1,29 @@
+# [IaC / K8s] Mauvaises pratiques volontaires (Checkov / kube-linter / Trivy)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vulnerable-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vulnerable-lab
+  template:
+    metadata:
+      labels:
+        app: vulnerable-lab
+    spec:
+      hostNetwork: true
+      containers:
+        - name: web
+          image: vulnerable-lab:latest
+          ports:
+            - containerPort: 5000
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            allowPrivilegeEscalation: true
+          env:
+            - name: DB_PASSWORD
+              value: "admin123"
+          # pas de limits/requests, pas de probes, pas de readOnlyRootFilesystem
